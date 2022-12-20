@@ -1,0 +1,117 @@
+---
+title: "XYZ Firm"
+author: "George.B"
+date: "2022-12-16"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Summary
+
+* What was the United State of America's GDP from 2001 to 2018.
+* Which States in the United State has the Highest GDP from 2001 to 2018.
+* List the Counties in the United State with the Highest GDP from 2005 to 2018
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(janitor)
+library(skimr)
+library(lubridate)
+library(tidyr)
+library(ggplot2)
+library(colorspace)
+library(here)
+```
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(readr)
+GDP_by_County <- read_csv("C:/Users/pc/Desktop/my project raw file/usa county with the highest gdp/GDP_by_County.csv")
+View(GDP_by_County)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+USA_gdp <- GDP_by_County %>% 
+  group_by(Year) %>%
+  drop_na() %>% 
+  summarise(total_gdp_yearly=sum(GDP_in_dollars))
+print(USA_gdp)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(data = USA_gdp)+
+  geom_smooth(mapping = aes(x=Year,y=total_gdp_yearly))+
+  geom_point(mapping = aes(x=Year, y=total_gdp_yearly, fill=Year))+
+  labs(title = "Year by Year GDP", subtitle = "USA GDP from 2001 to 2018")
+```
+
+* The chart above shows the year to year Gross Domestic Profit(GDP) for United State America.
+* The USA Economy grew from $13,230,272,271,000 in **2001** to $18,244,233,031,000 in 2018,but the the GDP dropped in 2008 and 2009
+ 
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+gdp_par_state <- GDP_by_County %>% 
+  group_by(Year, State) %>%
+  drop_na() %>% 
+  summarise(total_gdp_yearly=sum(GDP_in_dollars))
+view(gdp_par_state)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+gdp_par_state2 <- gdp_par_state %>% 
+  group_by(total_gdp_yearly,Year,State) %>% 
+  summarise(state_with_highest_gdp=max(total_gdp_yearly)) %>% 
+  tail(20)
+print(gdp_par_state2)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+ggplot(data = gdp_par_state2, aes(x=Year,y=state_with_highest_gdp, fill=Year))+
+  geom_col(position = "dodge")+
+  facet_wrap(~State)+
+  labs(title = "GDP by States", subtitle = "States with the Highest GDPs from 2001 to 2018")
+```
+
+* This chart shows USA states with the highest Gross Domestic Profit (GDP) from 2001 to 2018.
+* California has the highest GDP more than any other state in USA with a GDP of $1,705,688,782,000 in 2001 to $2,723,055,904,000. California GDP grew with over 1 trillion dollars in 12 years.
+* The State of Texas comes second wth a GDP of $1,652,917,964,000 in 2017 and $!,723,693,999,000 in 2018.
+
+
+
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+gdp_by_county <- GDP_by_County %>% 
+  group_by(Year,State,County) %>% 
+  drop_na() %>% 
+  summarise(county_gdp=sum(GDP_in_dollars))
+view(gdp_by_county)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+gdp_by_county2 <- gdp_by_county %>% 
+  group_by(county_gdp,Year,State,County) %>% 
+  drop_na() %>% 
+  summarise(counties_with_highest_gdp=max(county_gdp)) %>% 
+  tail(20)
+print(gdp_by_county2)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+ggplot(data = gdp_by_county2, aes(x=Year,y=counties_with_highest_gdp, fill=State))+
+  geom_col(position = "dodge")+
+  facet_wrap(~County)+
+  labs(title = "GDP by Counties", subtitle = "The counties with the Highest GDPs from 2005 to in 2018")
+```
+
+* This chart shows GDP by counties the highest GDP in each State in USA.
+* The County of Los Angeles has the highest GDP among other County from 2005 to 2018 with a GDP of $550,159,000,000 in 2005 and $710,893,000,000 in 2018.
+* While the County of New York came in second every time from with a GDP of $544,566,000,000 in 2012 and $600,244,000,000 in 2018.
+
+
+
+
+
+
+
